@@ -74,6 +74,20 @@ func withUser(fn handleFunc) handleFunc {
 		token, err := request.ParseFromRequest(r, &extractor{}, keyFunc, request.WithClaims(&tk))
 
 		if err != nil || !token.Valid {
+			// Check for proxy header and redirect to login if not present
+			auther, err := d.store.Auth.Get(d.settings.AuthMethod)
+			if err != nil {
+				return http.StatusInternalServerError, err
+			}
+
+			if combinedAuth, ok := auther.(*auth.CombinedAuth); ok {
+				username := r.Header.Get(combinedAuth.ProxyHeader)
+				if username == "" {
+					http.Redirect(w, r, "/login", http.StatusFound)
+					return 0, nil
+				}
+			}
+
 			return http.StatusUnauthorized, nil
 		}
 

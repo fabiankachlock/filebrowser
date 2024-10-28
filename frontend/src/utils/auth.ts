@@ -1,7 +1,7 @@
 import { useAuthStore } from "@/stores/auth";
 import router from "@/router";
 import { JwtPayload, jwtDecode } from "jwt-decode";
-import { baseURL, noAuth } from "./constants";
+import { baseURL, noAuth, authMethod } from "./constants";
 import { StatusError } from "@/api/utils";
 
 export function parseToken(token: string) {
